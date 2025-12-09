@@ -384,7 +384,7 @@ function App() {
               <div className="education-list">
                 {education.map((edu) => (
                   <div key={edu.title} className="education-item">
-                    <h3>{edu.title}</h3>
+                    <h3 className="education-title">{edu.title}</h3>
                     <div className="education-header-top">
                       <p className="education-meta">{edu.meta}</p>
                       {edu.finish && <span className="dates">{edu.finish}</span>}

@@ -406,8 +406,9 @@
   border-left: 2px solid var(--accent);
 }
 
-.education-item h3 {
+.education-title {
   margin: 0;
+  font-style: italic;
 }
 
 .education-header-top {
