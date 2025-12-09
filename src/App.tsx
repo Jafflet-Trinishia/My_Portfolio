@@ -12,6 +12,7 @@ import {
   FiStar,
 } from 'react-icons/fi'
 import profileImage from './assets/image.png'
+import resumePdf from './assets/Resume - Trinishia.pdf'
 import './App.css'
 
 const mlLogo =
@@ -267,6 +268,7 @@ function App() {
     () => (theme === 'dark' ? 'theme-dark' : 'theme-light'),
     [theme],
   )
+  const resumeUrl = resumePdf
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -391,7 +393,7 @@ function App() {
                   {theme === 'dark' ? 'Light theme' : 'Dark theme'}
                 </button>
                 <a
-                  href="/resume-trinishia.pdf"
+                  href={resumeUrl}
                   download
                   className="btn primary"
                 >
