@@ -30,3 +30,8 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+body.theme-light {
+  background: #e9eff6;
+  color: #0f172a;
+}

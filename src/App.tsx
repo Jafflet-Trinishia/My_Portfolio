@@ -1,20 +1,26 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   FiDownload,
   FiGithub,
   FiLinkedin as FiLinkedinIcon,
-  FiLinkedin,
   FiMail,
   FiMapPin,
   FiArrowUpRight,
   FiMoon,
   FiSun,
+  FiAward,
+  FiStar,
 } from 'react-icons/fi'
 import profileImage from './assets/image.png'
 import './App.css'
 
 const mlLogo =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><linearGradient id="mlY" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%23facc15"/><stop offset="1" stop-color="%23e9b50c"/></linearGradient><linearGradient id="mlB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%230f5c8a"/><stop offset="1" stop-color="%230c3f61"/></linearGradient></defs><rect width="200" height="200" rx="24" fill="transparent"/><path d="M100 26c-30 0-54 24-54 54v40c0 30 24 54 54 54V26z" fill="url(%23mlY)" stroke="%23facc15" stroke-width="2"/><path d="M100 26c30 0 54 24 54 54v40c0 30-24 54-54 54V26z" fill="url(%23mlB)" stroke="%230d3d5a" stroke-width="2"/><path d="M100 42v116" stroke="%23ffffff" stroke-opacity="0.18" stroke-width="3"/><g stroke="%23d9e8f5" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M132 58l16 14-12 18 18 12-20 14 12 20-22 12"/><circle cx="132" cy="58" r="4" fill="%23d9e8f5"/><circle cx="148" cy="72" r="4" fill="%23d9e8f5"/><circle cx="136" cy="90" r="4" fill="%23d9e8f5"/><circle cx="156" cy="102" r="4" fill="%23d9e8f5"/><circle cx="136" cy="116" r="4" fill="%23d9e8f5"/><circle cx="148" cy="136" r="4" fill="%23d9e8f5"/><circle cx="124" cy="148" r="4" fill="%23d9e8f5"/></g><path d="M84 60c-12 7-20 18-20 32 0 10 5 18 12 26-12 7-18 20-18 32 0 9 2 18 9 24" stroke="%23c48a00" stroke-width="6" fill="none" stroke-linecap="round"/></svg>'
+
+const sqlLogo =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200"><rect width="320" height="200" rx="24" fill="%23fff"/><g fill="none" stroke="%23d16e2f" stroke-width="12"><ellipse cx="96" cy="54" rx="64" ry="26"/><path d="M32 54v70c0 14 29 26 64 26s64-12 64-26V54"/><path d="M32 92c0 14 29 26 64 26s64-12 64-26"/><path d="M32 130c0 14 29 26 64 26s64-12 64-26"/></g><g fill="%23d16e2f" font-family="Arial,Helvetica,sans-serif" font-size="78" font-weight="700" letter-spacing="3"><text x="190" y="110">SQL</text></g></svg>'
+
+const excelLogo = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="%2328b567"/><stop offset="1" stop-color="%231f8c52"/></linearGradient><linearGradient id="sheet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%2321a366"/><stop offset="1" stop-color="%23127440"/></linearGradient></defs><rect width="240" height="180" rx="22" fill="%23f6f8fb"/><rect x="84" y="20" width="120" height="140" rx="18" fill="url(%23sheet)"/><rect x="40" y="36" width="84" height="108" rx="12" fill="url(%23bg)"/><path fill="%23fff" d="M62 70h18l13 22 13-22h18l-22 36 22 36h-18l-13-22-13 22H62l22-36z"/></svg>`
 
 const skillGrid = [
   {
@@ -27,11 +33,11 @@ const skillGrid = [
   },
   {
     name: 'SQL',
-    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg',
+    logo: sqlLogo,
   },
   {
     name: 'Excel',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7f/Microsoft_Office_Excel_%282019%E2%80%93present%29.svg',
+    logo: excelLogo,
   },
   {
     name: 'ETL',
@@ -84,15 +90,36 @@ const skillGrid = [
 ]
 
 const certifications = [
-  'Tableau, SQL, Agile & Job-Hunting Skills',
-  'Complete Data Analyst Bootcamp From Basics To Advanced',
-  'DevOps Jenkins Master',
-  'Machine Learning with Python',
-  'Power BI Data Analyst Associate Certification',
-  'Google Advanced Data Analytics: Professional Certificate',
-  'Excel Power Query, Power Pivot, DAX, Power BI & Power 3D Map',
-  'Advanced Programming Professional & Master Data Science',
-  'Deep Learning, AI, and Machine Learning by Stanford University',
+  {
+    title: 'Tableau, SQL, Agile & Job-Hunting Skills',
+    tag: 'Analytics',
+  },
+  {
+    title: 'Complete Data Analyst Bootcamp From Basics To Advanced',
+    tag: 'Bootcamp',
+  },
+  { title: 'DevOps Jenkins Master', tag: 'DevOps' },
+  { title: 'Machine Learning with Python', tag: 'ML' },
+  {
+    title: 'Power BI Data Analyst Associate Certification',
+    tag: 'Power BI',
+  },
+  {
+    title: 'Google Advanced Data Analytics: Professional Certificate',
+    tag: 'Google',
+  },
+  {
+    title: 'Excel Power Query, Power Pivot, DAX, Power BI & Power 3D Map',
+    tag: 'Excel',
+  },
+  {
+    title: 'Advanced Programming Professional & Master Data Science',
+    tag: 'Programming',
+  },
+  {
+    title: 'Deep Learning, AI, and Machine Learning by Stanford University',
+    tag: 'AI',
+  },
 ]
 
 const projects = [
@@ -193,16 +220,108 @@ const navItems = [
   { id: 'certifications', label: 'Certifications' },
 ]
 
+const testimonials = [
+  {
+    quote:
+      'The dashboards and automation drastically improved our reporting cadence. Clear, concise, and reliable.',
+    name: 'Priya N.',
+    role: 'Ops Lead',
+    rating: 4,
+  },
+  {
+    quote:
+      'Loved the clean visuals and the way insights were surfaced. We could spot trends in minutes.',
+    name: 'Dev K.',
+    role: 'Product Manager',
+    rating: 4,
+  },
+  {
+    quote:
+      'ETL workflows were rock solid and documentation was on point. Reduced manual checks by a mile.',
+    name: 'Sam R.',
+    role: 'Data Engineer',
+    rating: 3,
+  },
+  {
+    quote:
+      'Great collaboration and thoughtful analysis. Stakeholders finally trust the numbers every sprint.',
+    name: 'Lina T.',
+    role: 'Scrum Master',
+    rating: 5,
+  },
+  {
+    quote:
+      'Clear storytelling with data—executives leaned in. Automation saved hours every week.',
+    name: 'Marcus L.',
+    role: 'Director',
+    rating: 5,
+  },
+]
+
+const loopingTestimonials = [...testimonials, ...testimonials]
+
 function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [certsVisible, setCertsVisible] = useState(false)
   const palette = useMemo(
     () => (theme === 'dark' ? 'theme-dark' : 'theme-light'),
     [theme],
   )
 
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+    if (prefersReducedMotion) return
+
+    const revealElements = Array.from(
+      document.querySelectorAll<HTMLElement>('.reveal'),
+    )
+
+    const certSentinel = document.getElementById('skills-sentinel')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -10% 0px' },
+    )
+
+    revealElements.forEach((el) => observer.observe(el))
+    let certObserver: IntersectionObserver | undefined
+    if (certSentinel) {
+      certObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setCertsVisible(true)
+            }
+          })
+        },
+        { threshold: 0.1 },
+      )
+      certObserver.observe(certSentinel)
+    }
+
+    return () => {
+      observer.disconnect()
+      certObserver?.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    document.body.classList.toggle('theme-light', theme === 'light')
+    document.body.classList.toggle('theme-dark', theme === 'dark')
+  }, [theme])
+
   return (
     <main id="top" className={`page ${palette}`}>
-      <div className="layout">
+      <div className="page-wrapper">
         <aside className="sidebar">
           <div className="sidebar-header">
             <a
@@ -232,7 +351,7 @@ function App() {
         </aside>
 
         <section className="content">
-          <div className="card hero-card">
+          <div className="card hero-card reveal">
             <div className="hero-top">
               <div className="hero-id">
                 <a
@@ -309,13 +428,13 @@ function App() {
           </div>
 
           <div className="stack">
-            <section id="about" className="card">
+            <section id="about" className="card reveal">
               <h2 className="section-title">About me</h2>
               <p className="section-text">{profile.about}</p>
               <p className="section-text">{profile.aboutDetail}</p>
             </section>
 
-            <section id="research" className="card">
+            <section id="research" className="card reveal">
               <div className="pub-header">
                 <h2 className="section-title">Publications</h2>
                 <a className="pub-link" href="#publications">
@@ -324,7 +443,7 @@ function App() {
               </div>
               <div className="pub-grid">
                 {projects.map((project) => (
-                  <article key={project.title} className="pub-card">
+                  <article key={project.title} className="pub-card reveal">
                     <div
                       className="pub-thumb"
                       aria-hidden
@@ -353,7 +472,7 @@ function App() {
               </div>
             </section>
 
-            <section id="experience" className="card">
+            <section id="experience" className="card reveal">
               <h2 className="section-title">Experience</h2>
               <div className="experience-list">
                 {experiences.map((exp) => (
@@ -379,7 +498,36 @@ function App() {
               </div>
             </section>
 
-            <section id="education" className="card">
+            <section id="testimonials" className="card reveal testimonials-panel">
+              <div className="testimonials-header">
+                <span className="eyebrow">Voices</span>
+                <h2 className="section-title">What people say</h2>
+              </div>
+              <div className="testimonial-mask">
+                <div className="testimonial-track auto-loop">
+                  {loopingTestimonials.map((item, idx) => (
+                    <article key={`${item.quote}-${idx}`} className="testimonial-card">
+                      <div className="testimonial-stars" aria-label={`${item.rating} out of 5 stars`}>
+                        {Array.from({ length: 5 }).map((_, starIdx) => (
+                          <FiStar
+                            key={starIdx}
+                            className={starIdx < item.rating ? 'star active' : 'star'}
+                            aria-hidden
+                          />
+                        ))}
+                      </div>
+                      <p className="testimonial-quote">“{item.quote}”</p>
+                      <div className="testimonial-meta">
+                        <span className="testimonial-name">{item.name}</span>
+                        <span className="testimonial-role">{item.role}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section id="education" className="card reveal">
               <h2 className="section-title">Education</h2>
               <div className="education-list">
                 {education.map((edu) => (
@@ -401,7 +549,7 @@ function App() {
               </div>
             </section>
 
-            <section id="skills" className="card">
+            <section id="skills" className="card reveal">
               <div className="skill-banner">
                 <div className="skill-side-tab">
                   <span className="skill-side-text">Skills</span>
@@ -424,13 +572,25 @@ function App() {
               </div>
             </section>
 
-            <section id="certifications" className="card">
+            <div id="skills-sentinel" />
+
+            <section
+              id="certifications"
+              className={`card reveal ${certsVisible ? 'cert-visible' : 'cert-locked'}`}
+            >
               <h2 className="section-title">Certifications</h2>
-              <ul className="cert-list">
+              <div className="cert-grid">
                 {certifications.map((cert) => (
-                  <li key={cert}>{cert}</li>
+                  <div key={cert.title} className="cert-card">
+                    <div className="cert-icon">
+                      <FiAward />
+                    </div>
+                    <div className="cert-body">
+                      <p className="cert-title">{cert.title}</p>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </section>
           </div>
 
