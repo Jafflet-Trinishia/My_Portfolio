@@ -1238,6 +1238,17 @@
     align-items: flex-start;
   }
 
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .hero-links {
     flex-direction: column;
     align-items: flex-start;
@@ -1256,5 +1267,43 @@
   .avatar {
     width: 78px;
     height: 78px;
+  }
+
+  .skill-banner {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .skill-side-tab {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 0.2rem 0;
+  }
+
+  .skill-side-tab::before,
+  .skill-side-tab::after {
+    display: none;
+  }
+
+  .skill-side-text {
+    writing-mode: horizontal-tb;
+    transform: none;
+    padding: 0;
+    color: var(--text-main);
+  }
+
+  .skill-main {
+    padding: 1.1rem;
+  }
+
+  .skill-grid {
+    max-height: none;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .pub-grid,
+  .cert-grid {
+    grid-template-columns: 1fr;
   }
 }
