@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import {
   FiDownload,
   FiGithub,
@@ -9,6 +9,16 @@ import {
   FiMoon,
   FiSun,
   FiStar,
+  FiHome,
+  FiUser,
+  FiFileText,
+  FiGrid,
+  FiBriefcase,
+  FiBookOpen,
+  FiLayers,
+  FiAward,
+  FiMenu,
+  FiX,
 } from 'react-icons/fi'
 import profileImage from './assets/image.png'
 import resumePdf from './assets/Resume - Trinishia.pdf'
@@ -213,13 +223,15 @@ const profile = {
 }
 
 const navItems = [
-  { id: 'about', label: 'About' },
-  { id: 'research', label: 'Research' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'education', label: 'Education' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'certifications', label: 'Certifications' },
-  { id: 'contact', label: 'Contact' },
+  { id: 'top', label: 'Home', icon: FiHome },
+  { id: 'about', label: 'About', icon: FiUser },
+  { id: 'research', label: 'Research', icon: FiGrid },
+  { id: 'experience', label: 'Experience', icon: FiBriefcase },
+  { id: 'education', label: 'Education', icon: FiBookOpen },
+  { id: 'skills', label: 'Skills', icon: FiLayers },
+  { id: 'certifications', label: 'Certifications', icon: FiAward },
+  { id: 'resume-link', label: 'Resume', icon: FiFileText, external: true },
+  { id: 'contact', label: 'Contact', icon: FiMail },
 ]
 
 const testimonials = [
@@ -253,7 +265,7 @@ const testimonials = [
   },
   {
     quote:
-      'Clear storytelling with data—executives leaned in. Automation saved hours every week.',
+      'Clear storytelling with data�executives leaned in. Automation saved hours every week.',
     name: 'Marcus L.',
     role: 'Director',
     rating: 5,
@@ -265,6 +277,7 @@ const loopingTestimonials = [...testimonials, ...testimonials]
 function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [certsVisible, setCertsVisible] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const palette = useMemo(
     () => (theme === 'dark' ? 'theme-dark' : 'theme-light'),
     [theme],
@@ -325,6 +338,42 @@ function App() {
   return (
     <main id="top" className={`page ${palette}`}>
       <div className="page-wrapper">
+        <button
+          className="mobile-fab"
+          aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+          onClick={() => setMobileNavOpen((prev) => !prev)}
+        >
+          {mobileNavOpen ? <FiX /> : <FiMenu />}
+        </button>
+        {mobileNavOpen && (
+          <div className="mobile-drawer open">
+            <div className="mobile-drawer-panel">
+              <div className="mobile-drawer-header">
+                <img src={profile.avatar} alt={profile.name} className="avatar" />
+                <div className="mobile-drawer-id">
+                  <p className="eyebrow">Portfolio</p>
+                  <h2 className="sidebar-name">{profile.name}</h2>
+                </div>
+              </div>
+              <nav className="mobile-drawer-menu">
+                {navItems.map((item) => (
+                  <a
+                    key={`drawer-${item.id}`}
+                    href={item.id === 'resume-link' ? resumeUrl : `#${item.id}`}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noreferrer' : undefined}
+                    className="mobile-drawer-item"
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    <item.icon className="mobile-menu-icon" />
+                    <span>{item.label}</span>
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </div>
+        )}
+
         <aside className="sidebar">
           <div className="sidebar-header">
             <a
@@ -343,10 +392,16 @@ function App() {
           <div className="menu-label">Menu</div>
           <nav className="menu">
             {navItems.map((item) => (
-              <a key={item.id} href={`#${item.id}`} className="menu-item">
-                <span className="menu-dot" />
-                <span>{item.label}</span>
-                <span className="menu-more">•••</span>
+              <a
+                key={item.id}
+                href={item.id === 'resume-link' ? resumeUrl : `#${item.id}`}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noreferrer' : undefined}
+                className={`menu-item ${item.id === 'top' ? 'active' : ''}`}
+              >
+                <item.icon className="menu-icon" />
+                <span className="menu-text">{item.label}</span>
+                <span className="menu-more">···</span>
               </a>
             ))}
           </nav>
@@ -354,6 +409,27 @@ function App() {
         </aside>
 
         <section className="content">
+          <div className="mobile-menu" aria-label="Mobile navigation">
+            {navItems.map((item) => (
+              <a
+                key={`mobile-${item.id}`}
+                href={item.id === 'resume-link' ? resumeUrl : `#${item.id}`}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noreferrer' : undefined}
+                className="mobile-menu-item"
+              >
+                <item.icon className="mobile-menu-icon" />
+                <span className="mobile-menu-text">{item.label}</span>
+              </a>
+            ))}
+            <input
+              className="mobile-search"
+              type="search"
+              placeholder="Search..."
+              aria-label="Search"
+            />
+          </div>
+
           <div className="card hero-card reveal">
             <div className="hero-top">
               <div className="hero-id">
@@ -670,6 +746,10 @@ function App() {
 }
 
 export default App
+
+
+
+
 
 
 
