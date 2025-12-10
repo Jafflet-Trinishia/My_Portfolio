@@ -11,7 +11,6 @@ import {
   FiStar,
   FiHome,
   FiUser,
-  FiFileText,
   FiGrid,
   FiBriefcase,
   FiBookOpen,
@@ -20,6 +19,7 @@ import {
   FiMenu,
   FiX,
 } from 'react-icons/fi'
+import { useRef, type MouseEvent } from 'react'
 import profileImage from './assets/image.png'
 import resumePdf from './assets/Resume - Trinishia.pdf'
 import './App.css'
@@ -230,9 +230,10 @@ const navItems = [
   { id: 'education', label: 'Education', icon: FiBookOpen },
   { id: 'skills', label: 'Skills', icon: FiLayers },
   { id: 'certifications', label: 'Certifications', icon: FiAward },
-  { id: 'resume-link', label: 'Resume', icon: FiFileText, external: true },
   { id: 'contact', label: 'Contact', icon: FiMail },
 ]
+
+type NavItem = (typeof navItems)[number]
 
 const testimonials = [
   {
@@ -278,6 +279,9 @@ function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [certsVisible, setCertsVisible] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('top')
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const contentRef = useRef<HTMLElement | null>(null)
   const palette = useMemo(
     () => (theme === 'dark' ? 'theme-dark' : 'theme-light'),
     [theme],
@@ -285,9 +289,18 @@ function App() {
   const resumeUrl = resumePdf
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches)
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  useEffect(() => {
     if (prefersReducedMotion) return
 
     const revealElements = Array.from(
@@ -328,15 +341,112 @@ function App() {
       observer.disconnect()
       certObserver?.disconnect()
     }
-  }, [])
+  }, [prefersReducedMotion])
 
   useEffect(() => {
     document.body.classList.toggle('theme-light', theme === 'light')
     document.body.classList.toggle('theme-dark', theme === 'dark')
   }, [theme])
 
+  useEffect(() => {
+    const sectionIds = navItems.map((item) => item.id)
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el))
+
+    if (!sections.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+
+        if (visibleEntries[0]) {
+          setActiveSection(visibleEntries[0].target.id)
+        }
+      },
+      {
+        root: null,
+        threshold: [0.3, 0.5, 0.7],
+        rootMargin: '-10% 0px -30% 0px',
+      },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+
+    return () => observer.disconnect()
+  }, [])
+
+  const handleNavClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    item: NavItem,
+    closeDrawer = false,
+  ) => {
+    event.preventDefault()
+    const scrollContainer =
+      contentRef.current &&
+      contentRef.current.scrollHeight >
+        contentRef.current.clientHeight + 2
+        ? contentRef.current
+        : null
+
+    const scrollToPosition = (top: number, duration = 900) => {
+      if (prefersReducedMotion) {
+        if (scrollContainer) {
+          scrollContainer.scrollTop = top
+        } else {
+          window.scrollTo({ top })
+        }
+        return
+      }
+
+      const start = scrollContainer
+        ? scrollContainer.scrollTop
+        : window.scrollY
+      const change = top - start
+      const startTime = performance.now()
+
+      const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
+
+      const step = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const eased = easeOut(progress)
+        const next = start + change * eased
+
+        if (scrollContainer) {
+          scrollContainer.scrollTop = next
+        } else {
+          window.scrollTo({ top: next })
+        }
+
+        if (progress < 1) requestAnimationFrame(step)
+      }
+
+      requestAnimationFrame(step)
+    }
+
+    if (item.id === 'top') {
+      scrollToPosition(0)
+    } else {
+      const target = document.getElementById(item.id)
+      if (target) {
+        const containerRect = scrollContainer?.getBoundingClientRect()
+        const targetRect = target.getBoundingClientRect()
+        const currentScroll = scrollContainer ? scrollContainer.scrollTop : window.scrollY
+        const containerTop = containerRect ? containerRect.top : 0
+        const offsetTop = currentScroll + targetRect.top - containerTop
+        scrollToPosition(offsetTop)
+      }
+    }
+
+    setActiveSection(item.id)
+    if (closeDrawer) setMobileNavOpen(false)
+  }
+
   return (
-    <main id="top" className={`page ${palette}`}>
+    <main className={`page ${palette}`}>
       <div className="page-wrapper">
         <button
           className="mobile-fab"
@@ -359,11 +469,10 @@ function App() {
                 {navItems.map((item) => (
                   <a
                     key={`drawer-${item.id}`}
-                    href={item.id === 'resume-link' ? resumeUrl : `#${item.id}`}
-                    target={item.external ? '_blank' : undefined}
-                    rel={item.external ? 'noreferrer' : undefined}
-                    className="mobile-drawer-item"
-                    onClick={() => setMobileNavOpen(false)}
+                    href={`#${item.id}`}
+                    className={`mobile-drawer-item ${item.id === activeSection ? 'active' : ''}`}
+                    aria-current={item.id === activeSection ? 'true' : undefined}
+                    onClick={(event) => handleNavClick(event, item, true)}
                   >
                     <item.icon className="mobile-menu-icon" />
                     <span>{item.label}</span>
@@ -394,10 +503,10 @@ function App() {
             {navItems.map((item) => (
               <a
                 key={item.id}
-                href={item.id === 'resume-link' ? resumeUrl : `#${item.id}`}
-                target={item.external ? '_blank' : undefined}
-                rel={item.external ? 'noreferrer' : undefined}
-                className={`menu-item ${item.id === 'top' ? 'active' : ''}`}
+                href={`#${item.id}`}
+                className={`menu-item ${item.id === activeSection ? 'active' : ''}`}
+                aria-current={item.id === activeSection ? 'true' : undefined}
+                onClick={(event) => handleNavClick(event, item)}
               >
                 <item.icon className="menu-icon" />
                 <span className="menu-text">{item.label}</span>
@@ -408,15 +517,15 @@ function App() {
           <div className="menu-footer">Scroll to explore</div>
         </aside>
 
-        <section className="content">
+        <section ref={contentRef} className="content">
           <div className="mobile-menu" aria-label="Mobile navigation">
             {navItems.map((item) => (
               <a
                 key={`mobile-${item.id}`}
-                href={item.id === 'resume-link' ? resumeUrl : `#${item.id}`}
-                target={item.external ? '_blank' : undefined}
-                rel={item.external ? 'noreferrer' : undefined}
-                className="mobile-menu-item"
+                href={`#${item.id}`}
+                className={`mobile-menu-item ${item.id === activeSection ? 'active' : ''}`}
+                aria-current={item.id === activeSection ? 'true' : undefined}
+                onClick={(event) => handleNavClick(event, item)}
               >
                 <item.icon className="mobile-menu-icon" />
                 <span className="mobile-menu-text">{item.label}</span>
@@ -430,7 +539,7 @@ function App() {
             />
           </div>
 
-          <div className="card hero-card reveal">
+          <div id="top" className="card hero-card reveal">
             <div className="hero-top">
               <div className="hero-id">
                 <a
