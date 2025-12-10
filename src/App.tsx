@@ -8,7 +8,6 @@ import {
   FiArrowUpRight,
   FiMoon,
   FiSun,
-  FiAward,
   FiStar,
 } from 'react-icons/fi'
 import profileImage from './assets/image.png'
@@ -91,6 +90,7 @@ const skillGrid = [
 ]
 
 const certifications = [
+
   {
     title: 'Tableau, SQL, Agile & Job-Hunting Skills',
     tag: 'Analytics',
@@ -219,6 +219,7 @@ const navItems = [
   { id: 'education', label: 'Education' },
   { id: 'skills', label: 'Skills' },
   { id: 'certifications', label: 'Certifications' },
+  { id: 'contact', label: 'Contact' },
 ]
 
 const testimonials = [
@@ -438,8 +439,8 @@ function App() {
 
             <section id="research" className="card reveal">
               <div className="pub-header">
-                <h2 className="section-title">Publications</h2>
-                <a className="pub-link" href="#publications">
+                <h2 className="section-title">Research</h2>
+                <a className="pub-link" href="#research">
                   View all <FiArrowUpRight />
                 </a>
               </div>
@@ -584,14 +585,79 @@ function App() {
               <div className="cert-grid">
                 {certifications.map((cert) => (
                   <div key={cert.title} className="cert-card">
-                    <div className="cert-icon">
-                      <FiAward />
-                    </div>
                     <div className="cert-body">
                       <p className="cert-title">{cert.title}</p>
                     </div>
                   </div>
                 ))}
+              </div>
+            </section>
+
+            <section id="contact" className="card reveal contact-panel">
+              <div className="contact-body">
+                <div className="contact-header">
+                  <div>
+                    <h2 className="section-title">Connect with me</h2>
+                    <p className="section-text">
+                      I'm dedicated to contributing to your organization's growth and achieving great
+                      results together. Feel free to contact me via email or LinkedIn for
+                      collaborations or inquiries.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="contact-grid">
+                  <div className="contact-card">
+                    <div className="contact-meta-block">
+                      <p className="contact-meta-label">Contact</p>
+                      <a className="contact-meta-value" href={`mailto:${profile.email}`}>
+                        {profile.email}
+                      </a>
+                      <a
+                        className="contact-meta-value"
+                        href={`tel:${profile.phone.replace(/\\s+/g, '')}`}
+                      >
+                        {profile.phone}
+                      </a>
+                    </div>
+                    <div className="contact-meta-block">
+                      <p className="contact-meta-label">Based in</p>
+                      <p className="contact-meta-value">{profile.location}</p>
+                    </div>
+                    <div className="contact-meta-block">
+                      <p className="contact-meta-label">Connect</p>
+                      <div className="contact-social-row">
+                        <a
+                          href="https://github.com/Jafflet-Trinishia"
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label="GitHub profile"
+                        >
+                          <FiGithub />
+                        </a>
+                        <a
+                          href="https://www.linkedin.com/in/jafflet-trinishia"
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label="LinkedIn profile"
+                        >
+                          <FiLinkedinIcon />
+                        </a>
+                        <a href={`mailto:${profile.email}`} aria-label="Email link">
+                          <FiMail />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="contact-card contact-availability">
+                    <p className="contact-meta-label">Message</p>
+                    <p className="contact-meta-value">
+                      I currently handle messages directly. Please email or DM me, and I'll reply as soon
+                      as possible.
+                    </p>
+                  </div>
+                </div>
               </div>
             </section>
           </div>
@@ -604,3 +670,5 @@ function App() {
 }
 
 export default App
+
+
